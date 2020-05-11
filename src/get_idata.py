@@ -23,12 +23,12 @@ def get_idata(path="",kw="",fdate="",ldate=""):
     Pre-set parameters: geo="",timezone=eastern
     """
     
-    pytrend = TrendReq( hl="en-US" , tz=300 )
+    pytrend = TrendReq( hl="en-US" , tz=300)
 
     dt1 = datetime.strptime(fdate, '%Y-%m-%dT%H')
     dt2 = datetime.strptime(ldate, '%Y-%m-%dT%H')
     
-    print("Begin saving csv...")
+    print("Begin saving {} data csv...".format(kw))
     df=pytrend.get_historical_interest([kw],
                                     year_start=dt1.year,
                                     month_start=dt1.month, 
@@ -41,24 +41,33 @@ def get_idata(path="",kw="",fdate="",ldate=""):
                                     cat=0, 
                                     geo='', 
                                     gprop='', 
-                                    sleep=0
+                                    sleep=120
                                     )
 
-    fname="{}_{}_{}.csv".format( kw , fdate , ldate  )
+    fname="{}.csv".format( kw.replace(" ","-") )
     save_path=os.path.join(path,fname)
     df.to_csv(save_path)
     print("file saved to: {}".format(save_path))
 
 if __name__ == "__main__":
     
+    CDATA_PATH="../data/coins"
+    IDATA_PATH="../data/interest"
     
-    DATA_PATH="data/interest"
-    #kw_list=["Bitcoin","Ether","Bytecoin","Bitcoin SV","Chainlink","BitShares","DigiByte","HedgeTrade",]
-    
-    date2,date1="2020-05-01T00","2015-05-01T00"
-    
-    get_idata(path=DATA_PATH,kw="Ethereum",fdate=date1,ldate=date2)
-    
+    sleep_time=720
+    for filename in os.listdir(CDATA_PATH):
+        df=pd.read_csv( os.path.join( CDATA_PATH,filename) )
+        name=filename[:filename.find(".")].replace("-"," ")
+        
+        date1=df["open_time_iso"].values[0].replace(" ","T")[:-6]
+
+        get_idata(path=IDATA_PATH,kw=name,fdate=date1,ldate="2020-05-01T00")
+        
+        
+        time.sleep(sleep_time)
+        sleep_time=sleep_time+60
+        
+    print("ALL FILES SAVED")
     
     
     

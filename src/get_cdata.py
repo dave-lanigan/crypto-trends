@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 
-def get_cdata(path="",pair="",start_date="", end_date=""):
+def get_cdata(path="",name="",pair="",start_date="", end_date=""):
     
     """Collects coin price data from binance API saves a .csv file.
     Arguments:
@@ -32,14 +32,14 @@ def get_cdata(path="",pair="",start_date="", end_date=""):
     print("Got data. Now saving...")
     d1,d2=dateparser.parse(start_date),dateparser.parse(end_date)
     
-    fname="{}_{}_{}.csv".format( pair , d1.isoformat()[:-12] , d2.isoformat()[:-12]  )
+    fname="{}.csv".format( name )
     save_path=os.path.join(path,fname)
     
     with open(save_path,"w+") as f:
         f.write("open_time_iso,open_time_unix,open,high,low,close,volume,close_time,number_of_trades\n")
         for kline in klines:
             f.write( "{},{},{},{},{},{},{},{},{}\n".format(
-            datetime.fromtimestamp(kline[0]/1000).isoformat(),
+            datetime.fromtimestamp(kline[0]/1000).isoformat().replace("T"," "),
                                                     kline[0],
                                                     kline[1],
                                                     kline[2],
@@ -56,13 +56,13 @@ if __name__ == "__main__":
     
     import pandas as pd
     
-    CSAVE_PATH="data/coins"
+    CSAVE_PATH="../data/coins"
 
     start_date,end_date='May 1, 2015 12:00 AM EST','May 1, 2020 12:00 AM EST'
     BASE_COIN="USDT"
     
     
-    df=pd.read_csv("data/coins.csv")
+    df=pd.read_csv("../data/coins.csv")
     
     names,symbols=df["name"].values,df["symbol"].values
     
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             
             try:
                 print("Trying {}".format(PAIR))
-                get_cdata(path=CSAVE_PATH,pair=PAIR,start_date=start_date,end_date=end_date)
+                get_cdata(path=CSAVE_PATH,name=name,pair=PAIR,start_date=start_date,end_date=end_date)
             except:
                 print("Saving coin data for {} failed".format(name))
                 failed.append((name,"coin data" ))
