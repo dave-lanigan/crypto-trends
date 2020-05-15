@@ -37,6 +37,9 @@ The data was then transfered into a postgresql database a table for each coin (p
     └── sql_queries.py
 
 ```
+
+### SET UP
+
 #### Requirements
 * Python 3
 * pandas
@@ -52,8 +55,10 @@ For data acquisition operate in the following way:
 >> python3 get_data.py
 >> python3 etl.py
 ```
-If you all collecting data from scratch for the first time under the [DATA] section change get=append to get=collect.
-If the you leave the get=append flag on then the get_data.py file will search the .csv files for the last date collect and begin collection from there. Additionally only dates that have not been added to the postgres databases will be added.
+If you all collecting data from scratch for the first time under the [data] section change get=append to get=collect.
+If the you leave the get=append flag on then the get_data.py file will search the .csv files for the last date collect and begin collection from there. Additionally only dates that have not been added to the postgres databases will be added.<br/>
+<br>
+For both appending data to .csv files and sending data to the database only coins with BOTH interest and price data will be used.
 
 
 
