@@ -11,6 +11,7 @@ The data was then transfered into a postgresql database a table for each coin (p
 <br>
 Postgres was chosen as the database because of its wide use, open source nature my already personal familiarity with pyscopg2. Pandas python library proved to be a useful data manipulation tool as well.
 
+![image info](./db.png)
 
 
 ### STRUCTURE
@@ -28,6 +29,7 @@ Postgres was chosen as the database because of its wide use, open source nature 
 │       └── ...
 ├── README.md
 ├── requirements.txt
+├── db.png
 └── src
     ├── example_config.json
     ├── etl.py
