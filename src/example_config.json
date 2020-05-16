@@ -1,0 +1,5 @@
+{ 
+"postgres": {"host":"localhost", "db_name":"devfp", "db_user":"name"},
+"data": {"base_path":"../data", "trends_get":"append", "coins_get": "append", "sql_flag":"collect"},
+"base_coin":{"name":"Tether","ticker":"USDT"}
+}

@@ -7,3 +7,4 @@ data/coins_backup
 config.json
 get_idata.py
 get_info.py
+sql_queries_old.py

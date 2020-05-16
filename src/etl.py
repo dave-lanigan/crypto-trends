@@ -6,26 +6,20 @@ import os
 from sql_queries import *
 
 
-def get_names_set(base_path,type="all",form="sql"):
+def get_names_set(base_path="../data",form="sql"):
     """
-    EXAMPLE
-    Imports data from an S3 bucket to a Redshift database table given the table name
+    Returns a list of coin names and table names that are in BOTH interest/ and coins/
     
     Arguments:
-        table {str}: table name
-        redshift_conn_id {str}: airflow connection id for redshift
-        aws_credentials_id {str}: airflow connection id for aws
-        s3_bucket {str}: S3 bucket name.
-        s3_key {str}:
-        iam {str}:
-        region {str}: Region that the s3 bucket is from.
-        json {str}:
-        **kwargs: Pass in key-value pairs of dates in the format "year"="2018","month"="11"} to import only part of data
-                    otherwise all data will be imported.
+        base_path {str}: table name
+        form {str}:
+            "sql": returns sql tables compatible names
+            "basic": returns coins names. 
     Return:
-        No return.
+        tables_names {list}
+        coin_names {list}
     """
-    ipath,cpath=base_path+"interest",base_path+"coins"
+    ipath,cpath=os.path.join(base_path,"interest/"),os.path.join(base_path,"coins/")
     
     cnames=[]
     for filename in os.listdir(cpath):
@@ -50,57 +44,70 @@ def get_names_set(base_path,type="all",form="sql"):
 
 
 def drop_tables(cur, conn, table_names):
+    """drops the tables"""
     cur.execute(drop_coin_info_table)
     conn.commit()
     for name in table_names:
-        pquery=sql.SQL(drop_price_tables).format( sql.SQL( name ) ) 
-        iquery=sql.SQL(drop_interest_tables).format( sql.SQL(name) )
+        pquery=sql.SQL(drop_coin_tables).format( sql.SQL( name ) ) 
         cur.execute(pquery)
-        cur.execute(iquery)
     conn.commit()
     
 def create_tables(cur, conn, table_names):
+    """creates the tables"""
     cur.execute(create_coin_info_table)
     conn.commit()
     
     for name in table_names:
-        pquery=sql.SQL(create_price_tables).format( sql.SQL( name ) ) 
-        iquery=sql.SQL(create_interest_tables).format( sql.SQL(name) )
+        pquery=sql.SQL(create_coin_tables).format( sql.SQL( name ) ) 
         cur.execute(pquery)
-        cur.execute(iquery)
     conn.commit()
 
 def insert_coin_info(cur,conn,base_path,table_names,coin_names):
-    df=pd.read_csv( base_path+"coins.csv" )
+    """
+    Performs an insert of the coin info.
+    """
+    df=pd.read_csv( os.path.join( base_path,"coins.csv" ) )
     A=df[ (df.name).isin(coin_names) ].values
 
     for coin_row in A:
-        cur.execute(insert_into_coin_info_table , coin_row[1:] )
+        cur.execute(insert_into_coin_info_tables , coin_row[1:] )
     conn.commit()
     
 def insert_cidata(cur,conn,base_path,table_names,coin_names):
-    CDATA,IDATA="interest","coins"
+
+    """
+    Performs sql table inserts for each coin
+    
+    Arguments:
+        cur {obj}: pyscopg2 curser
+        conn {obj}: pyscopg2 connection
+        base_path {str}: path
+        table_names {list}
+        coin_names {list}
+    Return:
+        Nothing.
+    """
     
     for i,name in enumerate(table_names):
-        coindf=pd.read_csv(base_path+"coins/{}.csv".format(coin_names[i]))
-        interestdf=pd.read_csv(base_path+"interest/{}.csv".format(coin_names[i]))
-        coinA,interstA=coindf.values,interestdf.values
-        # df.merge(interestdf,coindf,left_on="date",right_on="open_time_iso",how="inner")
-        # out=df.values
-        for row in coinA:
-            pquery=sql.SQL(insert_into_price_table).format(sql.SQL(name))
+        coin_name=coin_names[i]
+        coindf=pd.read_csv(os.path.join(base_path,"coins/{}.csv".format(coin_name) ) )
+        interestdf=pd.read_csv(os.path.join(base_path,"interest/{}.csv".format(coin_name) ) )
+        joindf=pd.merge( coindf,interestdf,left_on="open_time_iso",right_on="date",how="inner")
+        joindf=joindf.drop(["date","isPartial"],axis=1)
+        A=joindf.values
+        for row in A:
+            pquery=sql.SQL(insert_into_coin_table).format(sql.SQL(name))
             cur.execute(pquery,row)
         conn.commit()
         
-        for row in interstA:
-            iquery=sql.SQL(insert_into_interest_table).format(sql.SQL(name))
-            cur.execute(iquery,row[:-1])
-        conn.commit()
 
 def main():
+    """Runs functions to perform etl"""
     jfile=open("config.json")
     config=json.load(jfile)
     jfile.close()
+    BASE_PATH=config["data"]["base_path"]
+    SQL_FLAG=config["data"]["sql_flag"]
     conn=psycopg2.connect(
     "host={} dbname={} user={}".format( config["postgres"]["host"],
                                         config["postgres"]["db_name"],
@@ -110,20 +117,17 @@ def main():
     
     table_names=get_names_set(BASE_PATH,form="sql")
     coin_names=get_names_set(BASE_PATH,form="basic")
-    drop_tables(cur, conn, table_names)
-    create_tables(cur, conn, table_names)
+
+    if SQL_FLAG=="collect":
+        drop_tables(cur, conn, table_names)
+        create_tables(cur, conn, table_names)
+    
     insert_coin_info(cur,conn,BASE_PATH,table_names,coin_names)
     insert_cidata(cur,conn,BASE_PATH,table_names,coin_names)
 
-    cur.execute("SELECT * FROM coin_info LIMIT 5")
+    cur.execute("SELECT * FROM _bitcoin_ LIMIT 5")
     print(cur.fetchone())
 
-    cur.execute("SELECT * FROM price_bitcoin LIMIT 5")
-    print(cur.fetchone())
-
-    cur.execute("SELECT * FROM interest_bitcoin LIMIT 5")
-    print(cur.fetchone())
-    
     conn.close()
 
 
