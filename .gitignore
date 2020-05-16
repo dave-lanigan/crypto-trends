@@ -1,0 +1,8 @@
+*.pyc
+*.cfg
+src/get_data.py
+Old
+get_data_old.py
+data/coins_backup
+config.json
+test_.py

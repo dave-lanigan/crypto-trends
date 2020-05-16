@@ -34,6 +34,9 @@ def get_info():
         
 
     df=pd.DataFrame(data=coins[1:],columns=coins[0])
-    df.to_csv("data/coins.csv",index_col=False)
+    df.to_csv("../data/coins.csv",index=False)
     
     print("Data saved.")
+
+
+get_info()
