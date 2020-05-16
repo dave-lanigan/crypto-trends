@@ -5,4 +5,5 @@ Old
 get_data_old.py
 data/coins_backup
 config.json
-test_.py
+get_idata.py
+get_info.py
