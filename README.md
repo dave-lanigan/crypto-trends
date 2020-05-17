@@ -76,7 +76,7 @@ For both appending data to .csv files and sending data to the database only coin
 
 Sample SQL queries that are desirable to run are the following:
 ```
-db=# SELECT open_time_iso,open,relative_interest FROM _Bitcoin_ WHERE 
+db=# SELECT open_time_iso,open,relative_interest FROM _Bitcoin_ WHERE relative_interest > 20;
 ```
 
 ##### Use with Spark:
