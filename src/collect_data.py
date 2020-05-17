@@ -1,5 +1,6 @@
 import json
 from get_data import get_coin_data, get_trend_data, get_info
+import time
 
 """This module can be used to collect all the data for the first time"""
 

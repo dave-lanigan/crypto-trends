@@ -8,9 +8,12 @@ import os
 from datetime import datetime
 import requests
 import pandas as pd
+from pytrends.request import TrendReq
+import time
+
 
 """
-
+This module has function to retrieve coin info, price, and google trends data and save to .csv files
 """
 
 def get_coin_names_all(base_path,form="tickers"):
@@ -31,18 +34,27 @@ def get_coin_names_all(base_path,form="tickers"):
         return names
 
 def convert_date(date):
-    """
+    """Converts ISO 8601 date to a human readable format
     Arguments:
         date {str}: Date in the ISO 8601 format *with hour* YYYY-MM-DDT01
     Returns:
         ndate {str}: a human readable date
     """
-    time=datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
-    ######-----
+    time=datetime.strptime(date, "%Y-%m-%dT%H")
+    hour=time.hour
+    if hour<12:
+        ampm="AM"
+        if hour==0:
+            hour = "12"
+    elif hour>=12:
+        ampm="PM"
+        if hour>12:
+            hour = int(hour)-12
 
-    return "{} {}, {} 12:00 AM EST".format( time.strftime("%b"), time.day, time.year)
+    return "{} {}, {} {}:00 {} EST".format( time.strftime("%B"), time.day, time.year, hour, ampm )
 
 def get_info():
+    """Collects and saves to .csv a list of the top 50 coins from coingeck api."""
     
     print("Getting coin info data...")
     base_url="https://api.coingecko.com/api/v3/coins/"
@@ -93,6 +105,8 @@ def get_coin_data(get_flag="",path="",name="",pair="",start_date="", end_date=""
     ##set up
     jfile=open("config.json")
     config=json.load(jfile)
+
+    fname="{}.csv".format( name.replace(" ","-"))
         
     if path=="":
         path=os.path.join(config["data"]["base_path"],"coins/")
@@ -102,34 +116,45 @@ def get_coin_data(get_flag="",path="",name="",pair="",start_date="", end_date=""
    
     if get_flag=="collect":
         status="w+"
-    
+        if start_date=="":
+            start_date=="May 1, 2015 12:00 AM EST"
     elif get_flag=="append":
-        coin_path=os.path.join(config["data"]["base_path"],"coins/{}.csv".format(name))
-        coindf=pd.read_csv( coin_path )
-        start_date=coindf.tail().values[4][0].replace(" ","T")[:-6]
-        status="a+"
+        write_status="a+"
 
+        ###get start date from file
+        if start_date != "":
+            print("Warning the start_date should be left blank for appending so that the last end_date is used.")
+            
+            if datetime.strptime(start_date, "%Y-%m-%dT%H") >= datetime.strptime(end_date, "%Y-%m-%dT%H"):
+                print("Data acquisition already satisfied")
+                return False
+        
+        elif start_date=="":
+            coin_path=os.path.join(config["data"]["base_path"],"coins/{}".format(fname))
+            coindf=pd.read_csv( coin_path )
+            start_date=coindf["open_time_iso"].iloc[-1:].values[0][:-6].replace(" ","T")
+            print(start_date)
+            if datetime.strptime(start_date, "%Y-%m-%dT%H") >= datetime.strptime(end_date, "%Y-%m-%dT%H"):
+                print("Data acquisition already satisfied")
+                return False
 
     print("Getting data for Coin: {}, Pair: {}, dates: {} to {}".format(name,pair,start_date,end_date))
+    start_date,end_date=convert_date(start_date),convert_date(end_date)
+    print(start_date,end_date)
+    
     client=Client()
     klines= client.get_historical_klines(pair,
                                          Client.KLINE_INTERVAL_1HOUR,
                                          start_date,
                                          end_date)
-    
-    fname="{}.csv".format( name )
-    save_path=os.path.join(path,fname)
     
 
-    print("Getting data for Coin: {}, Pair: {}, Up to Date: {}".format(name,pair,end_date))
-    client=Client()
-    klines= client.get_historical_klines(pair,
-                                         Client.KLINE_INTERVAL_1HOUR,
-                                         start_date,
-                                         end_date)
-    print("Got data. Now saving...")
-    with open(save_path,status) as f:
-        f.write("open_time_iso,open_time_unix,open,high,low,close,volume,close_time,number_of_trades\n")
+    save_path=os.path.join(path,fname)
+
+    print("Got data. Now {}ing...".format(get_flag))
+    with open(save_path,write_status) as f:
+        if write_status=="collect":
+            f.write("open_time_iso,open_time_unix,open,high,low,close,volume,close_time,number_of_trades\n")
         for kline in klines:
             f.write( "{},{},{},{},{},{},{},{},{}\n".format(
             datetime.fromtimestamp(kline[0]/1000).isoformat().replace("T"," "),
@@ -143,10 +168,8 @@ def get_coin_data(get_flag="",path="",name="",pair="",start_date="", end_date=""
                                                     kline[8]
                                                     ) )
 
-    print("Data saved here: {}".format(save_path))
+    print("Data saved here {}.".format(save_path))
     
-
-
 def get_trend_data(get_flag="",path="",kw="",start_date="",end_date=""):
     
     """Collects google trends data based on keyword and saves a .csv file.
@@ -165,6 +188,10 @@ def get_trend_data(get_flag="",path="",kw="",start_date="",end_date=""):
     pytrend = TrendReq( hl="en-US" , tz=300)
     jfile=open("config.json")
     config=json.load(jfile)
+
+    fname="{}.csv".format( kw.replace(" ","-") )
+    interest_path=os.path.join(config["data"]["base_path"],"interest/{}".format(fname))
+    coin_path=os.path.join(config["data"]["base_path"],"coins/{}".format(fname))
         
     if path=="":
         path=os.path.join(config["data"]["base_path"],"interest/")
@@ -174,26 +201,30 @@ def get_trend_data(get_flag="",path="",kw="",start_date="",end_date=""):
     
     if get_flag=="collect":
         if start_date=="":
-            coin_path=os.path.join(config["data"]["base_path"],"coins/{}.csv".format(name))
             coindf=pd.read_csv( coin_path )
-            start_date=coindf.head().values[0][0].replace(" ","T")[:-6]
+            start_date=coindf["open_time_iso"].iloc[-1:].values[0][:-6].replace(" ","T")
         elif start_date != "":
             print("Warning. You posted a start date. General you want to leave this blank so that the price data start date automatically is used.")
 
     elif get_flag=="append":
-        if start_date=="":
-            interest_path=os.path.join(config["data"]["base_path"],"interest/{}.csv".format(name))
-            intdf=pd.read_csv( interest_path )
-            start_date=intdf.tail().values[4][0].replace(" ","T")[:-6]
-        elif start_date != "":
+        if start_date != "":
             print("Warning. You posted a start date. General you want to leave this blank so that the last date automatically used.")
+            if datetime.strptime(start_date, "%Y-%m-%dT%H") >= datetime.strptime(end_date, "%Y-%m-%dT%H"):
+                print("Data acquisition already satisfied")
+                return False
 
+        elif start_date=="":
+            intdf=pd.read_csv( interest_path )
+            start_date=intdf["date"].iloc[-1:].values[0][:-6].replace(" ","T")
+            if datetime.strptime(start_date, "%Y-%m-%dT%H") >= datetime.strptime(end_date, "%Y-%m-%dT%H"):
+                print("Data acquisition already satisfied")
+                return False
 
 
     dt1 = datetime.strptime(start_date, '%Y-%m-%dT%H')
     dt2 = datetime.strptime(end_date, '%Y-%m-%dT%H')
     
-    print("Begin saving {} data csv...".format(kw))    
+    print("Getting interest data for Coin: {}, dates: {} to {}".format(kw,start_date,end_date))    
     df=pytrend.get_historical_interest([kw],
                                     year_start=dt1.year,
                                     month_start=dt1.month, 
@@ -208,18 +239,19 @@ def get_trend_data(get_flag="",path="",kw="",start_date="",end_date=""):
                                     gprop='', 
                                     sleep=120
                                     )
-    fname="{}.csv".format( kw.replace(" ","-") )
+
     
+    save_path=interest_path
+
     if get_flag=="collect":
-        save_path=os.path.join(path,fname)
         df.to_csv(save_path)
-        print("file saved as: {}".format(save_path))
     elif get_flag=="append":  
-        with open(,"a+") as f:
+        with open(save_path,"a+") as f:
             for row in df.values:
                 f.write("{},{},{}".format(row[0],row[1],row[2]))
             f.close()
-        print("file {} appended to".format(save_path))
+    
+    print("file {}ed here {}.".format(get_flag,save_path))
 
 if __name__ == "__main__":
     
