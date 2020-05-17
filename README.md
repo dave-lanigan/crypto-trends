@@ -37,6 +37,7 @@ Postgres was chosen as the database because of its wide use, open source nature 
     ├── collect_data.py
     ├── append_data.py
     ├── get_data.py
+    ├── test_.py
     └── sql_queries.py
 
 ```
