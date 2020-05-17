@@ -53,7 +53,12 @@ Postgres was chosen as the database because of its wide use, open source nature 
 * psycopg2
 * requests
 
-The configuration file should be edited. The example_config.json cann be used for this.
+The configuration file should be edited. The example_config.json can be used for this.
+
+If you all collecting data from scratch for the first time under the [data] section change trends_get/coins_get=append to trends_get/coins_get=collect.
+If the you leave the "get" flags to  append then the files will search the .csv files for the last date collect and begin collection from there. Additionally only dates that have not been added to the postgres databases will be added.<br/>
+<br>
+For both appending data to .csv files and sending data to the database only coins with BOTH interest and price data will be added.
 
 To re-download all the data (will take a few days) and then create databases - run the scripts the following way:
 ```
@@ -65,11 +70,6 @@ Otherwise to append data to the pre-made .csv files. Run the scripts in the foll
 >> python3 append_data.py
 >> python3 etl.py
 ```
-
-If you all collecting data from scratch for the first time under the [data] section change trends_get/coins_get=append to trends_get/coins_get=collect.
-If the you leave the "get" flags to  append then the files will search the .csv files for the last date collect and begin collection from there. Additionally only dates that have not been added to the postgres databases will be added.<br/>
-<br>
-For both appending data to .csv files and sending data to the database only coins with BOTH interest and price data will be added.
 
 
 ### NOTES/DISCUSSION
