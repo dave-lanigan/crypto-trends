@@ -53,7 +53,7 @@ def convert_date(date):
 
     return "{} {}, {} {}:00 {} EST".format( time.strftime("%B"), time.day, time.year, hour, ampm )
 
-def get_info():
+def get_info(base_path):
     """Collects and saves to .csv a list of the top 50 coins from coingeck api."""
     
     print("Getting coin info data...")
@@ -85,7 +85,7 @@ def get_info():
         
 
     df=pd.DataFrame(data=coins[1:],columns=coins[0])
-    df.to_csv("../data/coins.csv",index=False)
+    df.to_csv(os.path.join(base_path,"coins.csv"),index=False)
     
     print("Data saved.")
 
