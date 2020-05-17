@@ -4,8 +4,8 @@ Old
 get_data_old.py
 data/coins_backup
 config.json
-get_idata.py
-get_info.py
+src/get_idata.py
+src/get_info.py
 sql_queries_old.py
 data/interest_bu/
 data/coins_bu/
