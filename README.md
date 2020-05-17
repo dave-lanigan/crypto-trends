@@ -80,7 +80,7 @@ db=# SELECT open_time_iso,open,relative_interest FROM _Bitcoin_ WHERE relative_i
 ```
 
 ##### Use with Spark:
-Use with Spark, an popular big-data analysis tool can be used to analysis the data easily since the data is store in a postgres databse. You could also use Spark to access the .csv directly:
+Use with Spark, an popular big-data analysis tool can be used to analysis the data easily since the data is store in a postgres databse. You could also use Spark to access the .csv directly.
 
 
 ##### Use with airflow:
