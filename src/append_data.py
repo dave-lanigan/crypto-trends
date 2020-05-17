@@ -1,8 +1,5 @@
-from get_cdata import get_coins_data
-from etl import get_names
 import json
-from get_cdata import get_coin_data
-from get_idata import get_trend_data
+from get_data import get_coin_data, get_trend_data
 
 """This module can be used to add more data to .csv file store"""
 
@@ -15,10 +12,8 @@ BASE_PATH=config["data"]["base_path"]
 CSAVE_PATH=os.path.join(BASE_PATH,"coins/")
 ISAVE_PATH=os.path.join(BASE_PATH,"interest/")
 
-now=datetime.datetime.now()
 
-##get yesterdat at 1 AM
-end_date=
+end_date="2020-06-01T00"
 
 for filename in os.listdir(CSAVE_PATH):
     
