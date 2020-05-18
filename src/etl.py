@@ -42,7 +42,6 @@ def get_names_set(base_path="../data",form="sql"):
         table_names=[name.replace("-","_").lower() for name in coin_names]
         return table_names
 
-
 def drop_tables(cur, conn, table_names):
     """drops the tables"""
     cur.execute(drop_coin_info_table)
