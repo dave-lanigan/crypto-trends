@@ -95,7 +95,7 @@ The data acquisition and ETL is performed as follows by the above scripts:
 
 Postgres was chosen as the database because of its wide use, open source nature my already personal familiarity with pyscopg2. A SQL database provide convient and simple data storage and query options using sql query language. Pandas python library proved to be a useful data manipulation tool as well and was used frequently to manipulate and prepare .csv file contents.
 
-The data base model is simple and allows for easy access to coin specific data for comparing prices and trends. A sql database allows for easy access to the data. The data is seperated into a table for each of the cryptocurrenies with primary key of the database is the time date + hour. This allows for queries comparing google trend and coin price comparisons to be easy made with one line queries such as the one below.
+The data base model is simple and allows for easy access to coin specific data for comparing prices and trends. A sql database allows for easy access to the data. The data is seperated into a table for each of the cryptocurrenies with primary key of the database is the time date + hour. This allows for queries comparing google trend and coin price comparisons to be easy made with one line queries such as the one below. The coin tables can be join on the open_time_iso or open_time_unix columns.
 
 Sample SQL query:
 ```
