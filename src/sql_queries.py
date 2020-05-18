@@ -4,22 +4,22 @@ drop_coin_info_table="DROP TABLE IF EXISTS coin_info"
 drop_coin_tables="DROP TABLE IF EXISTS _{}_data"
 
 
-create_coin_tables="""CREATE TABLE IF NOT EXISTS _{}_ (open_time_iso varchar PRIMARY KEY,
+create_coin_tables="""CREATE TABLE IF NOT EXISTS _{}_ (open_time_iso timestamp PRIMARY KEY,
                                               open_time_unix bigint,
-                                              "open" double precision,
-                                              "high" double precision,
-                                              "low" double precision,
-                                              "close" double precision,
-                                              "volume" bigint,
+                                              "open" real,
+                                              "high" real,
+                                              "low" real,
+                                              "close" real,
+                                              "volume" int,
                                               close_time bigint,
-                                              number_of_trades bigint,
-                                              relative_interest int
+                                              number_of_trades int,
+                                              relative_interest smallint
                                               );"""
 
 create_coin_info_table=""" CREATE TABLE IF NOT EXISTS coin_info (
                                              "symbol" varchar(10) PRIMARY KEY,
                                              "name" varchar(100),
-                                             market_cap_rank int,
+                                             market_cap_rank smallint,
                                              links varchar,
                                              "description" text
                                              );"""

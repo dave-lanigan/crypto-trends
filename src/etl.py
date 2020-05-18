@@ -94,6 +94,7 @@ def insert_cidata(cur,conn,base_path,table_names,coin_names):
         joindf=pd.merge( coindf,interestdf,left_on="open_time_iso",right_on="date",how="inner")
         joindf=joindf.drop(["date","isPartial"],axis=1)
         A=joindf.values
+        print(name)
         for row in A:
             pquery=sql.SQL(insert_into_coin_table).format(sql.SQL(name))
             cur.execute(pquery,row)

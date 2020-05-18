@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<header>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</header>
+
+
+<div class="container mb-3 mt-3">
+
+    <div id="coin-info-table" class="container">
+        <table class="table table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+            <th scope="colgroup">(coin_info) Coin Information Data Table</th>
+            </tr>
+        </thead>
+        <thead>
+        <tr>
+            <th scope="col">Field Name</th>
+            <th scope="col">Field Size</th>
+            <th scope="col">Data Type</th>
+            <th scope="col">Description</th>
+            <th scope="col">Example</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>symbol (PK)</td>
+            <td>10</td>
+            <td>VARCHAR</td>
+            <td>A string of capital letters.</td>
+            <td>BTC</td>
+        </tr>
+        <tr>
+            <td>name</td>
+            <td>100</td>
+            <td>VARCHAR</td>
+            <td>The cryptocurrency's name.</td>
+            <td>Bitcoin</td>
+        </tr>
+        <tr>
+            <td>market_cap_rank</td>
+            <td>100</td>
+            <td>INT</td>
+            <td>Numerical ranking by market capitolization.</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>link</td>
+            <td>Varying</td>
+            <td>VARCHAR</td>
+            <td>Link to the coin website.</td>
+            <td>https://bitcoin.org/en/</td>
+        </tr>
+        <tr>
+            <td>description</td>
+            <td>Varying</td>
+            <td>TEXT</td>
+            <td>A block of text that describing the coin.</td>
+            <td>Bitcoin is the first successful internet...</td>
+        </tr>
+        </tbody>
+        </table>
+
+        <table id="price-interest-table" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                <th scope="col">(_Bitcoin_) Coin Price and Interest Data Table [Example]</th>
+                </tr>
+            </thead>
+            <thead>
+            <tr>
+                <th scope="col">Field Name</th>
+                <th scope="col">Field Size</th>
+                <th scope="col">Data Type</th>
+                <th scope="col">Description</th>
+                <th scope="col">Example</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>open_time_iso (PK)</td>
+                <td>19</td>
+                <td>TIMESTAMP</td>
+                <td>Date and time in ISO 8601 format.</td>
+                <td>2017-08-17 00:00:00</td>
+
+            </tr>
+            <tr>
+                <td>open_time_unix</td>
+                <td>13</td>
+                <td>BIGINT</td>
+                <td>Unix time in microseconds.</td>
+                <td>1502942400000</td>
+                
+            </tr>
+            <tr>
+                <td>open</td>
+                <td>Varying</td>
+                <td>REAL</td>
+                <td>The price at market open.</td>
+                <td>4261.48</td>
+            </tr>
+            <tr>
+                <td>high/td>
+                <td>Varying</td>
+                <td>REAL</td>
+                <td>The high price for the period.</td>
+                <td>4261.48</td>
+            </tr>
+            <tr>
+                <td>low</td>
+                <td>Varying</td>
+                <td>REAL</td>
+                <td>The low price for the period.</td>
+                <td>4261.48</td>
+            </tr>
+            <tr>
+                <td>close</td>
+                <td>Varying</td>
+                <td>REAL</td>
+                <td>The price at market close.</td>
+                <td>4261.48</td>
+            </tr>
+            <tr>
+                <td>volume</td>
+                <td>Varying</td>
+                <td>INT</td>
+                <td>The average trading volume.</td>
+                <td>47</td>
+            </tr>
+            <tr>
+                <td>close_time</td>
+                <td>13</td>
+                <td>BIGINT</td>
+                <td>The unix close time in microseconds.</td>
+                <td>1502942400000</td>
+            </tr>
+            <tr>
+                <td>number_of_trades</td>
+                <td>Varying</td>
+                <td>INT</td>
+                <td>The number of trades in the period.</td>
+                <td>1047</td>
+            </tr>
+            <tr>
+                <td>relative_interest</td>
+                <td>Varying</td>
+                <td>SMALLINT</td>
+                <td>The Google trends interest - ranges from 0 to 100.</td>
+                <td>21</td>
+            </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                <td>NOTE: The bitcoin table above is an example is the same 
+                    format as  all other cryptocurrency tables. The true table name is parantheses. </td>
+                </tr>
+            </tfoot>
+        
+            </table>
+            </div>
+
+
+
+
+</div>
