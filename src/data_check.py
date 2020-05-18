@@ -22,7 +22,7 @@ cur = conn.cursor()
 table_names=get_names_set(BASE_PATH,form="sql")
 coin_names=get_names_set(BASE_PATH,form="basic")
 
-len_fails,date_fails=[],[]
+len_fails,date_fails,type_fails=[],[],[]
 for i,table in enumerate(table_names):
     name=coin_names[i]
     print("checking table for {}".format(name))
@@ -47,6 +47,13 @@ for i,table in enumerate(table_names):
         print("Row length test FAILED.")
         date_fails.append(name)
 
+    if type(out[6])==int and type(out[9])==int:
+        print("Element type test PASSED.")
+    elif type(out[6])!=int or type(out[9])!=int:
+        print("Element type test FAILED.")
+        type_fails.append(name)
+
+
 print(" ")
 print(" ")
 print("Tests complete.")
@@ -56,3 +63,6 @@ print("Table Row Length Test Fails; Coins: {}".format( " ".join(len_fails) ) )
 print(" ")
 print("Table Date Test Fails; Number: {}".format(len(date_fails)))
 print("Table Date Test Fails; Coins: {}".format( " ".join(date_fails) ) )
+print(" ")
+print("Table Date Test Fails; Number: {}".format(len(type_fails)))
+print("Table Date Test Fails; Coins: {}".format( " ".join(type_fails) ) )
